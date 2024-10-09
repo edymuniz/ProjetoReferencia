@@ -34,7 +34,6 @@
     <ProjectReference Include="..\ProjetoReferencia.Application\ProjetoReferencia.Application.csproj" />
     <ProjectReference Include="..\ProjetoReferencia.Domain\ProjetoReferencia.Domain.csproj" />
     <ProjectReference Include="..\ProjetoReferencia.Infra\ProjetoReferencia.Infra.csproj" />
-    <ProjectReference Include="..\ProjetoReferencia\ProjetoReferencia.csproj" />
   </ItemGroup>
 
 </Project>

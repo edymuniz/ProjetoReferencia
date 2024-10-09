@@ -1,80 +1,93 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ProjetoReferencia.Domain.Entity;
-using ProjetoReferencia.Infra.Data;
-using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
+using RabbitMQ.Client;
 using System.Text;
+using ProjetoReferencia.Domain.Entity;
 using System.Text.Json;
+using ProjetoReferencia.Infra.Data;
 
-namespace ProjetoReferencia.Infra.RabbitMq
+public class RabbitMqConsumer : BackgroundService
 {
-    public class RabbitMqConsumer : BackgroundService
+    private readonly IConnectionFactory _connectionFactory;
+    private readonly IServiceScopeFactory _scopeFactory;
+    private IConnection _connection;
+    private IModel _channel;
+
+    public RabbitMqConsumer(IConnectionFactory connectionFactory, IServiceScopeFactory scopeFactory)
     {
-        private readonly IConnectionFactory _connectionFactory;
-        private readonly IServiceScopeFactory _scopeFactory;
-        private IConnection _connection;
-        private IModel _channel;
+        _connectionFactory = connectionFactory;
+        _scopeFactory = scopeFactory;
+    }
 
-        public RabbitMqConsumer(IConnectionFactory connectionFactory, IServiceScopeFactory scopeFactory)
-        {
-            _connectionFactory = connectionFactory;
-            _scopeFactory = scopeFactory;
-        }
+    public override Task StartAsync(CancellationToken cancellationToken)
+    {
+        CreateConnection();
+        return base.StartAsync(cancellationToken);
+    }
 
-        public override Task StartAsync(CancellationToken cancellationToken)
+    private void CreateConnection()
+    {
+        try
         {
             _connection = _connectionFactory.CreateConnection();
             _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: "BikeRegisteredQueue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-            return base.StartAsync(cancellationToken);
+            _channel.QueueDeclare(queue: "NewBikeRegisteredQueue", durable: true, exclusive: false, autoDelete: false, arguments: null);
         }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        catch (BrokerUnreachableException ex)
         {
-            try
-            {
-                var consumer = new AsyncEventingBasicConsumer(_channel); // Alterado para AsyncEventingBasicConsumer
+            Console.WriteLine($"Erro ao conectar ao RabbitMQ: {ex.Message}");
+        }
+    }
 
-                consumer.Received += async (model, ea) =>
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        try
+        {
+            if (_channel == null)
+            {
+                CreateConnection(); // Tente reconectar se o canal estiver nulo
+            }
+
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.Received += async (model, ea) =>
+            {
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                var bike = JsonSerializer.Deserialize<Bike>(message);
+
+                if (bike?.Year == 2024)
                 {
-                    var body = ea.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
-                    var bike = JsonSerializer.Deserialize<Bike>(message);
-
-                    if (bike?.Year == 2024)
+                    using (var scope = _scopeFactory.CreateScope())
                     {
-                        using (var scope = _scopeFactory.CreateScope())
-                        {
-                            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                            dbContext.Bike.Add(bike);
-                            await dbContext.SaveChangesAsync();
-                        }
+                        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        dbContext.Bike.Add(bike);
+                        await dbContext.SaveChangesAsync();
                     }
-                };
+                }
+            };
 
-                _channel.BasicConsume(queue: "BikeRegisteredQueue", autoAck: true, consumer: consumer);
-                await Task.Delay(Timeout.Infinite, stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                // Logue a exceção para depuração
-                Console.WriteLine($"Error in RabbitMqConsumer: {ex.Message}");
-            }
+            _channel.BasicConsume(queue: "NewBikeRegisteredQueue", autoAck: true, consumer: consumer);
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
-
-        public override Task StopAsync(CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            _channel?.Close();
-            _connection?.Close();
-            return base.StopAsync(cancellationToken);
+            Console.WriteLine($"Erro em RabbitMqConsumer: {ex.Message}");
         }
+    }
 
-        public override void Dispose()
-        {
-            _channel?.Dispose();
-            _connection?.Dispose();
-            base.Dispose();
-        }
+    public override Task StopAsync(CancellationToken cancellationToken)
+    {
+        _channel?.Close();
+        _connection?.Close();
+        return base.StopAsync(cancellationToken);
+    }
+
+    public override void Dispose()
+    {
+        _channel?.Dispose();
+        _connection?.Dispose();
+        base.Dispose();
     }
 }

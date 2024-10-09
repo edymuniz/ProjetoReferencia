@@ -54,6 +54,7 @@ namespace ProjetoReferencia.Domain.Services
             if (newBike == null)
                 return null;
 
+            newBike.Identifier = "Queue-" + newBike.Identifier;
             await _rabbitMqProducer.PublishAsync(newBike);
             _mapper.Map<BikeResponseDto>(newBike);
 

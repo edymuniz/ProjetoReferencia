@@ -36,7 +36,6 @@ namespace ProjetoReferencia.Controllers
                 return BadRequest("Não foi possível cadastrar a moto!");
             }
 
-            // Retorna 201 Created, com o recurso criado e a rota para obtê-lo
             return CreatedAtAction(nameof(GetById), new { id = registeredBike.Id }, registeredBike);
         }
 
@@ -72,7 +71,7 @@ namespace ProjetoReferencia.Controllers
             }
             catch (KeyNotFoundException) 
             {
-                return NotFound("Moto não encontrada."); // Retorna 404 NotFound
+                return NotFound("Moto não encontrada."); 
             }
             catch (Exception ex)
             {
