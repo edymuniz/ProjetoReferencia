@@ -12,14 +12,24 @@ namespace ProjetoReferencia.Worker
             IHost host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices((context, services) =>
                 {
+                    //// Configurando RabbitMQ
+                    //var rabbitMqSettings = new RabbitMqSettings
+                    //{
+                    //    Host = Environment.GetEnvironmentVariable("RABBITMQ__Host") ?? "rabbitmq", // Mude para "rabbitmq"
+                    //    Port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ__Port") ?? "5672"),
+                    //    UserName = Environment.GetEnvironmentVariable("RABBITMQ__UserName") ?? "guest",
+                    //    Password = Environment.GetEnvironmentVariable("RABBITMQ__Password") ?? "guest",
+                    //    VirtualHost = Environment.GetEnvironmentVariable("RABBITMQ__VirtualHost") ?? "/"
+                    //};
+
                     // Configurando RabbitMQ
                     var rabbitMqSettings = new RabbitMqSettings
                     {
-                        Host = Environment.GetEnvironmentVariable("RABBITMQ__Host") ?? "rabbitmq", // Mude para "rabbitmq"
-                        Port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ__Port") ?? "5672"),
-                        UserName = Environment.GetEnvironmentVariable("RABBITMQ__UserName") ?? "guest",
-                        Password = Environment.GetEnvironmentVariable("RABBITMQ__Password") ?? "guest",
-                        VirtualHost = Environment.GetEnvironmentVariable("RABBITMQ__VirtualHost") ?? "/"
+                        Host = "rabbitmq", 
+                        Port = 5672,
+                        UserName = "guest",
+                        Password = "guest",
+                        VirtualHost = "/"
                     };
 
                     services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory
@@ -37,7 +47,7 @@ namespace ProjetoReferencia.Worker
                         options.UseNpgsql("Host=postgres;Port=5432;Username=admin;Password=admin123;Database=moto_rental")); // Utilize o nome do serviço postgres
 
                     // Registrando os serviços
-                    services.AddHostedService<RabbitMqConsumer>();
+                    //services.AddHostedService<RabbitMqConsumer>();
                     services.AddHostedService<Worker>();
                 })
                 .Build();
