@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="App\**" />
+    <EmbeddedResource Remove="App\**" />
+    <None Remove="App\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AppService\Bike\" />
+    <Folder Include="AppService\DeliveryDrivers\" />
+    <Folder Include="AppService\Rental\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjetoReferencia.Domain\ProjetoReferencia.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
