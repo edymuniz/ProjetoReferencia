@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: moto_rental
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - moto_rental_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_server
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - moto_rental_network
+
+  api:
+    build:
+      context: ./ProjetoReferencia
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - moto_rental_network
+
+volumes:
+  postgres_data:
+
+networks:
+  moto_rental_network:
+    driver: bridge
