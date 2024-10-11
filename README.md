@@ -1,57 +1,87 @@
-# ProjetoReferencia
+# Instruções para Acesso e Execução do Projeto ProjetoReferencia
 
-# README.txt
+Este documento contém as instruções necessárias para clonar, configurar e executar o projeto ProjetoReferencia utilizando Docker.
 
-## Como Executar o Docker Compose
+## Pré-requisitos
 
-Para executar os serviços do Docker definidos no arquivo `docker-compose.yml`, siga estas etapas:
+- Certifique-se de que você possui o Docker instalado em sua máquina. Você pode baixar o Docker [aqui](https://www.docker.com/get-started).
 
-1. **Certifique-se de que o Docker e o Docker Compose estão instalados.**
-   - Você pode verificar a instalação do Docker com o comando:
-     ```
-     docker --version
-     ```
-   - Para o Docker Compose, utilize:
-     ```
-     docker-compose --version
-     ```
+## Acessando o Projeto
 
-2. **Navegue até o diretório onde o arquivo `docker-compose.yml` está localizado.**
+1. **Clone o repositório:**
+   Abra o terminal e execute o seguinte comando para clonar o projeto:
 
-cd /caminho/para/o/ProjetoReferencia
+   ```bash
+   git clone <URL_DO_REPOSITORIO>
+   
+Substitua <URL_DO_REPOSITORIO> pela URL do seu repositório no Git.
 
-3. **Execute o Docker Compose.**
-Para iniciar os serviços definidos no arquivo `docker-compose.yml`, utilize o comando:
+Acesse a pasta raiz do projeto: Navegue até a pasta raiz do projeto onde está localizado o arquivo .sln e o docker-compose.yml:
 
-docker-compose up -d
+Subindo o Ambiente
+Suba o ambiente utilizando Docker Compose: No terminal, execute o seguinte comando para construir e iniciar os contêineres:
 
-4. **Verifique se os serviços estão em execução.**
-Para listar os containers em execução, use:
+docker-compose up --build
 
-RabbitMQ ->http://localhost:15672/ 
-user: guest
-pwd:guest
+Isso irá construir as imagens do Docker e iniciar os serviços necessários para o projeto.
 
-Com DBeaver: acesse o banco de dados:
-Host=localhost;Port=5432;Username=admin;Password=admin123;Database=moto_rental
+Verificando o Ambiente
+Acesse o RabbitMQ: Após iniciar os contêineres, você pode acessar a interface de gerenciamento do RabbitMQ no seu navegador:
+
+http://localhost:15672
+
+Utilize as credenciais padrão:
+
+Usuário: guest
+Senha: guest
+Visualizando o Banco de Dados: Para visualizar o banco de dados PostgreSQL, recomendamos o uso do DBeaver. Você pode baixar o DBeaver aqui.
+
+Conecte-se ao banco de dados utilizando as seguintes configurações:
+Host: localhost
+Porta: 5432
+Usuário: postgres
+Senha: <SUA_SENHA> (a senha que você definiu ao iniciar o contêiner do PostgreSQL)
+
+
+A Api poderá ser acessada no link: http://localhost:5000/swagger/index.html
+
+
+Para ajudar na validação:
 
 ## Script para Criar o Banco de Dados e a Tabela Bike
 
 -- Criação do banco de dados
 CREATE DATABASE moto_rental;
 
-CREATE TABLE Bike (
- Id SERIAL PRIMARY KEY,
- Identifier VARCHAR(100) NOT NULL,
- Year INT NOT NULL,
- Model VARCHAR(100) NOT NULL,
- Plate VARCHAR(50) NOT NULL
+CREATE TABLE "Bike" (
+    "Id" SERIAL PRIMARY KEY,
+    "Identifier" VARCHAR(100) NOT NULL,
+    "Year" INT NOT NULL,
+    "Model" VARCHAR(100) NOT NULL,
+    "Plate" VARCHAR(50) NOT NULL
 );
 
-INSERT INTO Bike (Identifier, Year, Model, Plate) VALUES
+INSERT INTO public."Bike"
+("Identifier", "Year", "Model", "Plate") VALUES
 ('ABC123', 2021, 'Modelo X', 'XYZ-1234'),
 ('DEF456', 2020, 'Modelo Y', 'ABC-5678'),
 ('GHI789', 2022, 'Modelo Z', 'JKL-9101');
 
+
+Utilizar o postman:
+Exemplos:
+
+Get - Todas as bikes
+curl --location 'http://localhost:5000/api/bikes/all'
+
+Post - cadastrar uma nova
+curl --location 'http://localhost:5000/api/bikes' \
+--header 'Content-Type: application/json' \
+--data '{
+  "identifier": "60",
+  "year": 2024,
+  "model": "delta",
+  "plate": "DDD1234"
+}'
 
 

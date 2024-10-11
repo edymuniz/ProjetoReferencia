@@ -43,8 +43,6 @@ namespace ProjetoReferencia
 
 
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            // Registrar RabbitMqConsumer como serviço hospedado
-            builder.Services.AddHostedService<RabbitMqConsumer>();
 
             // Adicionar serviços de aplicação
             builder.Services.AddScoped<IBikeAppService, BikeAppService>();
@@ -58,6 +56,17 @@ namespace ProjetoReferencia
             // Adicionar controllers
             builder.Services.AddControllers();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
+
             // Configurar Swagger
             builder.Services.AddSwaggerGen(c =>
             {
@@ -66,17 +75,19 @@ namespace ProjetoReferencia
 
             var app = builder.Build();
 
-            // Configurar middleware e rotas
-            if (app.Environment.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseDeveloperExceptionPage(); // Exibir páginas de erro detalhadas
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = "swagger"; // Defina o prefixo desejado
+            });
 
             app.UseHttpsRedirection();
+            app.UseCors("AllowAll");
+
             app.UseAuthorization();
             app.MapControllers();
+
             app.Run();
         }
     }

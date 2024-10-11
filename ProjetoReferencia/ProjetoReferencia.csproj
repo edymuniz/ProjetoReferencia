@@ -23,10 +23,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.8.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ProjetoReferencia.Application\ProjetoReferencia.Application.csproj" />
-    <ProjectReference Include="..\ProjetoReferencia.Domain\ProjetoReferencia.Domain.csproj" />
-    <ProjectReference Include="..\ProjetoReferencia.Infra\ProjetoReferencia.Infra.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ProjetoReferencia.Application\ProjetoReferencia.Application.csproj" />
+        <ProjectReference Include="..\ProjetoReferencia.Domain\ProjetoReferencia.Domain.csproj" />
+        <ProjectReference Include="..\ProjetoReferencia.Infra\ProjetoReferencia.Infra.csproj" />
+    </ItemGroup>
 
 </Project>

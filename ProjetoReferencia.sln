@@ -9,11 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjetoReferencia.Applicati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjetoReferencia.Infra", "ProjetoReferencia.Infra\ProjetoReferencia.Infra.csproj", "{C833980B-8A5A-484E-855D-BE2A8F8041F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjetoReferencia.Tests", "ProjetoReferencia.Tests\ProjetoReferencia.Tests.csproj", "{AECD576D-5A7A-4E35-A227-47A5AF2CCA77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjetoReferencia.Tests", "ProjetoReferencia.Tests\ProjetoReferencia.Tests.csproj", "{AECD576D-5A7A-4E35-A227-47A5AF2CCA77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjetoReferencia.Worker", "ProjetoReferencia.Worker\ProjetoReferencia.Worker.csproj", "{F44CD796-5ECC-4F59-874F-959CD2CACA64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjetoReferencia.Worker", "ProjetoReferencia.Worker\ProjetoReferencia.Worker.csproj", "{F44CD796-5ECC-4F59-874F-959CD2CACA64}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjetoReferencia", "ProjetoReferencia\ProjetoReferencia.csproj", "{A9EDDE5F-985F-4381-BC0B-FFF60D8EB956}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjetoReferencia", "ProjetoReferencia\ProjetoReferencia.csproj", "{2429DD07-5E86-4724-956A-CB1D96C6514D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,10 @@ Global
 		{F44CD796-5ECC-4F59-874F-959CD2CACA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F44CD796-5ECC-4F59-874F-959CD2CACA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F44CD796-5ECC-4F59-874F-959CD2CACA64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9EDDE5F-985F-4381-BC0B-FFF60D8EB956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9EDDE5F-985F-4381-BC0B-FFF60D8EB956}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9EDDE5F-985F-4381-BC0B-FFF60D8EB956}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9EDDE5F-985F-4381-BC0B-FFF60D8EB956}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2429DD07-5E86-4724-956A-CB1D96C6514D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2429DD07-5E86-4724-956A-CB1D96C6514D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2429DD07-5E86-4724-956A-CB1D96C6514D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2429DD07-5E86-4724-956A-CB1D96C6514D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

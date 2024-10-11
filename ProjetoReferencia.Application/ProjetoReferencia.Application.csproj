@@ -13,12 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AppService\Bike\" />
-    <Folder Include="AppService\DeliveryDrivers\" />
-    <Folder Include="AppService\Rental\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ProjetoReferencia.Domain\ProjetoReferencia.Domain.csproj" />
   </ItemGroup>
 

@@ -12,20 +12,10 @@ namespace ProjetoReferencia.Worker
             IHost host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices((context, services) =>
                 {
-                    //// Configurando RabbitMQ
-                    //var rabbitMqSettings = new RabbitMqSettings
-                    //{
-                    //    Host = Environment.GetEnvironmentVariable("RABBITMQ__Host") ?? "rabbitmq", // Mude para "rabbitmq"
-                    //    Port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ__Port") ?? "5672"),
-                    //    UserName = Environment.GetEnvironmentVariable("RABBITMQ__UserName") ?? "guest",
-                    //    Password = Environment.GetEnvironmentVariable("RABBITMQ__Password") ?? "guest",
-                    //    VirtualHost = Environment.GetEnvironmentVariable("RABBITMQ__VirtualHost") ?? "/"
-                    //};
-
                     // Configurando RabbitMQ
                     var rabbitMqSettings = new RabbitMqSettings
                     {
-                        Host = "rabbitmq", 
+                        Host = "rabbitmq_server",
                         Port = 5672,
                         UserName = "guest",
                         Password = "guest",
@@ -42,18 +32,22 @@ namespace ProjetoReferencia.Worker
                         DispatchConsumersAsync = true
                     });
 
-                    // Configurando o DbContext do PostgreSQL
                     services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseNpgsql("Host=postgres;Port=5432;Username=admin;Password=admin123;Database=moto_rental")); // Utilize o nome do serviço postgres
+                        options.UseNpgsql("Host=postgres;Port=5432;Username=admin;Password=admin123;Database=moto_rental"));
 
-                    // Registrando os serviços
-                    //services.AddHostedService<RabbitMqConsumer>();
-                    services.AddHostedService<Worker>();
+                    // Ativa o RabbitMqConsumer com base na configuração
+                    bool enableRabbitMqConsumer = context.Configuration.GetValue<bool>("ENABLE_RABBITMQ_CONSUMER");
+                    if (enableRabbitMqConsumer)
+                    {
+                        services.AddHostedService<RabbitMqConsumer>(); 
+                    }
+                    services.AddHostedService<Worker>(); 
                 })
                 .Build();
 
             host.Run();
         }
     }
-    
+
+
 }

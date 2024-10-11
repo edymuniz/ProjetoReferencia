@@ -1,6 +1,5 @@
 ﻿using ProjetoReferencia.Domain.DTO.Bike.Request;
 using ProjetoReferencia.Domain.DTO.Bike.Response;
-using ProjetoReferencia.Domain.Entity;
 using ProjetoReferencia.Domain.Interfaces.Services;
 
 namespace ProjetoReferencia.Application.Interface.Bike

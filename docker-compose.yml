@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.8' 
 services:
   postgres:
     image: postgres:13
@@ -25,13 +25,27 @@ services:
 
   api:
     build:
-      context: ./ProjetoReferencia
-      dockerfile: Dockerfile
+      context: . 
+      dockerfile: ./ProjetoReferencia/Dockerfile
     depends_on:
       - postgres
       - rabbitmq
     networks:
       - moto_rental_network
+    ports:
+      - "5000:80"  
+    entrypoint: ["dotnet", "ProjetoReferencia.dll"]
+
+  worker:
+    build:
+      context: .
+      dockerfile: ./ProjetoReferencia.Worker/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - moto_rental_network
+    entrypoint: ["dotnet", "ProjetoReferencia.Worker.dll"]
 
 volumes:
   postgres_data:

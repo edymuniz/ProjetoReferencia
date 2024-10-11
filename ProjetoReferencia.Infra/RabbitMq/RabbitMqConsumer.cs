@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Exceptions;
 using RabbitMQ.Client;
 using System.Text;
 using ProjetoReferencia.Domain.Entity;
 using System.Text.Json;
 using ProjetoReferencia.Infra.Data;
+using ProjetoReferencia.Domain.DTO.Bike.Request;
 
 public class RabbitMqConsumer : BackgroundService
 {
@@ -23,58 +23,41 @@ public class RabbitMqConsumer : BackgroundService
 
     public override Task StartAsync(CancellationToken cancellationToken)
     {
-        CreateConnection();
-        return base.StartAsync(cancellationToken);
-    }
 
-    private void CreateConnection()
-    {
-        try
-        {
-            _connection = _connectionFactory.CreateConnection();
-            _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: "NewBikeRegisteredQueue", durable: true, exclusive: false, autoDelete: false, arguments: null);
-        }
-        catch (BrokerUnreachableException ex)
-        {
-            Console.WriteLine($"Erro ao conectar ao RabbitMQ: {ex.Message}");
-        }
+        _connection = _connectionFactory.CreateConnection();
+        _channel = _connection.CreateModel();
+        _channel.QueueDeclare(queue: "NewBikeRegisteredQueue", durable: true, exclusive: false, autoDelete: false, arguments: null);
+
+        return base.StartAsync(cancellationToken);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
+        var consumer = new AsyncEventingBasicConsumer(_channel);
+        consumer.Received += async (model, ea) =>
         {
-            if (_channel == null)
-            {
-                CreateConnection(); // Tente reconectar se o canal estiver nulo
-            }
+            var body = ea.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+            var bike = JsonSerializer.Deserialize<Bike>(message);
 
-            var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.Received += async (model, ea) =>
+            ///
+            /// Manutenção do código: É uma boa prática manter a lógica do consumidor de mensagens separada 
+            /// do restante do código para facilitar a manutenção e o entendimento.
+            ///
+            if (bike?.Year == 2024)
             {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                var bike = JsonSerializer.Deserialize<Bike>(message);
-
-                if (bike?.Year == 2024)
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    using (var scope = _scopeFactory.CreateScope())
-                    {
-                        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                        dbContext.Bike.Add(bike);
-                        await dbContext.SaveChangesAsync();
-                    }
+                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();      
+                    dbContext.Bike.Add(bike);
+                    await dbContext.SaveChangesAsync();
                 }
-            };
+            }
+        };
 
-            _channel.BasicConsume(queue: "NewBikeRegisteredQueue", autoAck: true, consumer: consumer);
-            await Task.Delay(Timeout.Infinite, stoppingToken);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erro em RabbitMqConsumer: {ex.Message}");
-        }
+        _channel.BasicConsume(queue: "NewBikeRegisteredQueue", autoAck: true, consumer: consumer);
+
+        await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 
     public override Task StopAsync(CancellationToken cancellationToken)
